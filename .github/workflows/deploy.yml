@@ -1,0 +1,32 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      - name: Install Aliyun FC 2
+        run: |
+          sudo apt-get install python3-setuptools
+          sudo pip3 install aliyun-fc2
+
+      - name: Deploy with Aliyun FC 2
+        env:
+          FUNCTION_TRIGGER_URL: ${{ secrets.FUNCTION_TRIGGER_URL }}
+          ACCESS_KEY_ID: ${{ secrets.ALIYUN_ACCESS_KEY }}
+          ACCESS_KEY_SECRET: ${{ secrets.ALIYUN_ACCESS_SECRET }}
+        run: |
+          mkdir -p dist
+          cp src/* dist/
+          python3 setup.py deploy
