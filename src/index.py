@@ -3,6 +3,7 @@
 import base64
 import logging
 import sys
+import traceback
 from io import BytesIO, StringIO
 
 
@@ -29,7 +30,10 @@ def execute_code(code: str) -> bytes:
     sys.stdout = buffer
     sys.stderr = buffer
 
-    exec(code, {})
+    try:
+        exec(code, {})
+    except Exception as e:
+        traceback.print_exc()
     output = buffer.getvalue().encode()
 
     # Restore the original stdout
