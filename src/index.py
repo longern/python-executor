@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import base64
+import json
 import logging
 import sys
 import traceback
@@ -23,20 +24,28 @@ def config_matplotlib():
     plt.show = show_to_screen
 
 
-def execute_code(code: str) -> bytes:
+def execute_code(code: str, code_input: str = "") -> bytes:
     """Executes Python code and collects its output"""
 
-    buffer = StringIO()
-    sys.stdout = buffer
-    sys.stderr = buffer
+    if not code_input.endswith("\n"):
+        code_input += "\n"
+    input_buffer = StringIO()
+    input_buffer.write(code_input)
+    input_buffer.seek(0)
+    sys.stdin = input_buffer
+
+    output_buffer = StringIO()
+    sys.stdout = output_buffer
+    sys.stderr = output_buffer
 
     try:
         exec(code, {})
     except Exception as e:
         traceback.print_exc()
-    output = buffer.getvalue().encode()
+    output = output_buffer.getvalue().encode()
 
-    # Restore the original stdout
+    # Restore the original stdin and stdout
+    sys.stdin = sys.__stdin__
     sys.stdout = sys.__stdout__
     sys.stdout = sys.__stderr__
 
@@ -51,12 +60,16 @@ def handler(environ, start_response):
         request_body_size = int(environ.get("CONTENT_LENGTH", 0))
     except ValueError:
         request_body_size = 0
-    request_body = environ["wsgi.input"].read(request_body_size)
+    request_body: bytes = environ["wsgi.input"].read(request_body_size)
+
+    request_obj: dict = json.loads(request_body)
+    source = request_obj.get("source", "")
+    code_input = request_obj.get("input", "")
 
     config_matplotlib()
 
     logging.info(request_body)
-    output = execute_code(request_body)
+    output = execute_code(source, code_input)
     logging.info(output)
 
     # Construct response
