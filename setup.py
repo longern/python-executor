@@ -19,14 +19,15 @@ class DeployCommand(distutils.cmd.Command):
         pass
 
     def run(self) -> None:
-        function_trigger_url = os.getenv("FUNCTION_TRIGGER_URL")
-        match_pattern = "(https?://[^/]*)/[^/]*/proxy/([^/]*)/([^/]*)"
-        endpoint, service_name, function_name = re.match(match_pattern, function_trigger_url).groups()
+        function_compute_arn = os.getenv("FUNCTION_COMPUTE_ARN")
+        assert function_compute_arn
+        match_pattern = r"^acs:fc:([^:]*):(\d+):services/([^.]*)\..*/functions/(.*)$"
+        service_site, account_id, service_name, function_name = re.match(match_pattern, function_compute_arn).groups()
 
         client = fc2.Client(
-            endpoint=endpoint,
+            endpoint=f"http://{account_id}.{service_site}.fc.aliyuncs.com",
             accessKeyID=os.getenv("ACCESS_KEY_ID"),
-            accessKeySecret=os.getenv("ACCESS_KEY_SECRET"),
+            accessKeySecret=os.getenv("SECRET_ACCESS_KEY"),
             Timeout=300,
         )
         client.update_function(service_name, function_name, codeDir="dist")

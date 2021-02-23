@@ -23,10 +23,11 @@ jobs:
 
       - name: Deploy with Aliyun FC 2
         env:
-          FUNCTION_TRIGGER_URL: ${{ secrets.FUNCTION_TRIGGER_URL }}
-          ACCESS_KEY_ID: ${{ secrets.ALIYUN_ACCESS_KEY }}
-          ACCESS_KEY_SECRET: ${{ secrets.ALIYUN_ACCESS_SECRET }}
+          FUNCTION_COMPUTE_ARN: ${{ secrets.FUNCTION_COMPUTE_ARN }}
+          ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY_ID }}
+          SECRET_ACCESS_KEY: ${{ secrets.SECRET_ACCESS_KEY }}
         run: |
-          mkdir -p dist
-          cp src/* dist/
+          pip3 install --system -t dist pandas==1.0.5
+          rm -rf dist/numpy*
+          cp -r src/* dist/
           python3 setup.py deploy
