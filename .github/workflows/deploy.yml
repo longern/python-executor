@@ -19,7 +19,7 @@ jobs:
       - name: Install Aliyun FC 2
         run: |
           sudo apt-get install python3-setuptools
-          sudo pip3 install aliyun-fc2
+          sudo pip3 install -U aliyun-fc2 pip
 
       - name: Deploy with Aliyun FC 2
         env:
@@ -27,7 +27,7 @@ jobs:
           ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY_ID }}
           SECRET_ACCESS_KEY: ${{ secrets.SECRET_ACCESS_KEY }}
         run: |
-          pip3 install --system -t dist pandas==1.0.5
+          pip3 install -t dist pandas==1.0.5
           rm -rf dist/numpy*
           cp -r src/* dist/
-          python3 setup.py deploy
+          ./setup.py deploy
