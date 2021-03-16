@@ -24,7 +24,7 @@ def config_matplotlib():
     plt.show = show_to_screen
 
 
-def execute_code(code: str, code_input: str = "") -> bytes:
+def execute_code(code: str, code_input: str = "") -> str:
     """Executes Python code and collects its output"""
 
     if not code_input.endswith("\n"):
@@ -42,7 +42,7 @@ def execute_code(code: str, code_input: str = "") -> bytes:
         exec(code, {})
     except Exception as e:
         traceback.print_exc()
-    output = output_buffer.getvalue().encode()
+    output = output_buffer.getvalue()
 
     # Restore the original stdin and stdout
     sys.stdin = sys.__stdin__
@@ -74,6 +74,6 @@ def handler(environ, start_response):
 
     # Construct response
     status = "200 OK"
-    response_headers = [("Content-type", "text/plain")]
+    response_headers = [("Content-type", "application/json")]
     start_response(status, response_headers)
-    return [output]
+    return [json.dumps(output).encode()]
