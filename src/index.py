@@ -68,6 +68,9 @@ def handler(environ, start_response):
     code_input = request_obj.get("input", "")
 
     config_matplotlib()
+    os.environ["accessKeyID"] = ""
+    os.environ["accessKeySecret"] = ""
+    os.environ["securityToken"] = ""
 
     logging.info(request_body)
     output = execute_code(source, code_input)
