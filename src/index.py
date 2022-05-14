@@ -12,6 +12,7 @@ def config_matplotlib():
     def show_to_screen():
         figure_buffer = BytesIO()
         plt.savefig(figure_buffer, format="png")
+        plt.close()
         figure_base64 = base64.b64encode(figure_buffer.getvalue())
         print("data:image/png;base64," + figure_base64.decode())
 
