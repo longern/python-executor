@@ -27,7 +27,7 @@ jobs:
           ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY_ID }}
           SECRET_ACCESS_KEY: ${{ secrets.SECRET_ACCESS_KEY }}
         run: |
-          pip3 install -t dist pandas==1.0.5
+          pip3 install -t dist pandas==1.4.2
           rm -rf dist/numpy*
           cp -r src/* dist/
           ./setup.py deploy
